@@ -1,0 +1,74 @@
+---
+name: ansible
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/ansible.yml
+jobs:
+  build_ansible:
+    name: Build ansible
+    runs-on: ubuntu-20.04
+    steps:
+      - name: setup
+        env:
+          DPUT_CF: ${{ secrets.DPUT_CF }}
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+          SIGNING_PASSPHRASE: ${{ secrets.SIGNING_PASSPHRASE }}
+          SIGNING_OWNERTRUST: ${{ secrets.SIGNING_OWNERTRUST }}
+        run: |
+          sudo apt -y remove ansible || true
+          sudo apt -y remove ansible-base || true
+          sudo apt -y remove ansible-core || true
+          sudo apt -y remove ansible-test || true
+          sudo apt -y autoremove
+
+          echo "${DPUT_CF}" > ${HOME}/.dput.cf
+          echo "${SIGNING_KEY}" > ${HOME}/signing.key
+          echo "${SIGNING_PASSPHRASE}" > ${HOME}/signing.passphrase
+          echo "${SIGNING_OWNERTRUST}" > ${HOME}/signing.ownertrust
+
+          sudo apt -y install wget gpg gpg-agent
+
+          gpg --import --batch --pinentry-mode loopback --passphrase-file ${HOME}/signing.passphrase ${HOME}/signing.key
+          gpg --import-ownertrust --batch --pinentry-mode loopback --passphrase-file ${HOME}/signing.passphrase ${HOME}/signing.ownertrust
+          gpg --list-secret-keys --keyid-format LONG
+
+      - name: build
+        env:
+          DEB_NAME: ansible
+          DEB_VERSION: "2.10.6"
+          DEB_RELEASE: 4ppa
+          DEB_DIST: groovy focal bionic
+          DEB_PPA: ansible
+          DEBSIGN_KEYID: ${{ secrets.DEBSIGN_KEYID }}
+          TARBALL_URL: https://files.pythonhosted.org/packages/a0/53/881aa200bd3edf2e25e865629443791a02b3f2c4a8d8eef05f8bab0bd8c5/ansible-2.10.6.tar.gz
+        run: |
+          sudo apt -y install python3-setuptools devscripts debhelper dh-python python3-all
+
+          cd ${HOME}
+          wget ${TARBALL_URL}
+          rm -rf ${DEB_NAME}-${DEB_VERSION}
+          tar -xzf ${DEB_NAME}-${DEB_VERSION}.tar.gz
+          cd ${HOME}/${DEB_NAME}-${DEB_VERSION}
+          _ANSIBLE_SDIST_FROM_MAKEFILE=1 python3 setup.py sdist --dist-dir=dist
+          for DIST in ${DEB_DIST}; do
+            mkdir -p deb-build/${DIST}
+            tar -C deb-build/${DIST} -xzf dist/${DEB_NAME}-${DEB_VERSION}.tar.gz
+            cat > deb-build/${DIST}/${DEB_NAME}-${DEB_VERSION}/debian/changelog << EOF
+          ${DEB_NAME} (${DEB_VERSION}-${DEB_RELEASE}~${DIST}) ${DIST}; urgency=low
+
+            * ${DEB_VERSION} release
+
+           -- Ansible, Inc. <info@ansible.com>  Thu, 04 Feb 2021 03:07:01 +0000
+          EOF
+            cat deb-build/${DIST}/${DEB_NAME}-${DEB_VERSION}/debian/changelog
+            sed -i 's/debhelper-compat (= 12)/debhelper-compat (= 11)/g' deb-build/${DIST}/${DEB_NAME}-${DEB_VERSION}/debian/control
+            cat deb-build/${DIST}/${DEB_NAME}-${DEB_VERSION}/debian/control
+            chmod +x deb-build/${DIST}/${DEB_NAME}-${DEB_VERSION}/debian/rules
+            cd deb-build/${DIST}/${DEB_NAME}-${DEB_VERSION}
+            debuild --source-option='-I' -k${DEBSIGN_KEYID} -S -p"gpg --pinentry-mode loopback --passphrase-file ${HOME}/signing.passphrase"
+            cd -
+            dput ansible deb-build/${DIST}/${DEB_NAME}_${DEB_VERSION}-${DEB_RELEASE}~${DIST}_source.changes
+          done
