@@ -61,7 +61,7 @@ jobs:
 
             * ${DEB_VERSION} release
 
-           -- Ansible, Inc. <info@ansible.com>  Thu, 04 Feb 2021 03:07:01 +0000
+           -- Ansible, Inc. <info@ansible.com>  $(date -R)
           EOF
             cat deb-build/${DIST}/${DEB_NAME}-${DEB_VERSION}/debian/changelog
             sed -i 's/debhelper-compat (= 12)/debhelper-compat (= 11)/g' deb-build/${DIST}/${DEB_NAME}-${DEB_VERSION}/debian/control
