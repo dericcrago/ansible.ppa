@@ -39,7 +39,7 @@ jobs:
         env:
           DEB_NAME: ansible
           DEB_VERSION: "3.0.0b1"
-          DEB_RELEASE: 4ppa
+          DEB_RELEASE: 5ppa
           DEB_DIST: groovy focal bionic
           DEB_PPA: ansible-beta
           DEBSIGN_KEYID: ${{ secrets.DEBSIGN_KEYID }}
