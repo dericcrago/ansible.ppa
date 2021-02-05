@@ -39,9 +39,9 @@ jobs:
         env:
           DEB_NAME: ansible-base
           DEB_VERSION: "2.10.5"
-          DEB_RELEASE: 5ppa
+          DEB_RELEASE: 6ppa
           DEB_DIST: groovy focal bionic
-          DEB_PPA: ansible
+          DEB_PPA: ansible-base
           DEBSIGN_KEYID: ${{ secrets.DEBSIGN_KEYID }}
           OFFICIAL: yes
           TARBALL_URL: https://files.pythonhosted.org/packages/bf/44/a75eec7928986a48e179769873f282496e007587e112c57d367c5e1abc1a/ansible-base-2.10.5.tar.gz
