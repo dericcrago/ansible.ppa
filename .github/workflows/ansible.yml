@@ -39,7 +39,7 @@ jobs:
         env:
           DEB_NAME: ansible
           DEB_VERSION: "2.10.6"
-          DEB_RELEASE: 8ppa
+          DEB_RELEASE: 9ppa
           DEB_DIST: groovy focal bionic
           DEB_PPA: ansible
           DEBSIGN_KEYID: ${{ secrets.DEBSIGN_KEYID }}
@@ -70,5 +70,5 @@ jobs:
             cd deb-build/${DIST}/${DEB_NAME}-${DEB_VERSION}
             debuild --source-option='-I' -k${DEBSIGN_KEYID} -S -p"gpg --pinentry-mode loopback --passphrase-file ${HOME}/signing.passphrase"
             cd -
-            dput ansible deb-build/${DIST}/${DEB_NAME}_${DEB_VERSION}-${DEB_RELEASE}~${DIST}_source.changes
+            dput ${DEB_PPA} deb-build/${DIST}/${DEB_NAME}_${DEB_VERSION}-${DEB_RELEASE}~${DIST}_source.changes
           done
