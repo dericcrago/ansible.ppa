@@ -7,6 +7,7 @@
 #### Latest Stable Version
 
 ```bash
+sudo add-apt-repository ppa:deric.crago/ansible-base
 sudo add-apt-repository ppa:deric.crago/ansible
 sudo apt-get update
 sudo apt-get install ansible
