@@ -39,16 +39,16 @@ jobs:
         env:
           DEB_NAME: ansible
           DEB_VERSION: "3.0.0rc1"
-          DEB_RELEASE: 1ppa
+          DEB_RELEASE: 2ppa
           DEB_DIST: groovy focal bionic
           DEB_PPA: ansible-beta
           DEBSIGN_KEYID: ${{ secrets.DEBSIGN_KEYID }}
-          TARBALL_URL: https://files.pythonhosted.org/packages/7e/02/59b9ac7e4787fede81921fd371326c1e92c078de2f634d3f73d448bf674d/ansible-3.0.0rc1.tar.gz
+          TARBALL_BASE_URL: https://pypi.python.org/packages/source
         run: |
           sudo apt -y install python3-setuptools devscripts debhelper dh-python python3-all
 
           cd ${HOME}
-          wget ${TARBALL_URL}
+          wget ${TARBALL_BASE_URL}/${DEB_NAME:0:1}/${DEB_NAME}/${DEB_NAME}-${DEB_VERSION}.tar.gz
           rm -rf ${DEB_NAME}-${DEB_VERSION}
           tar -xzf ${DEB_NAME}-${DEB_VERSION}.tar.gz
           cd ${HOME}/${DEB_NAME}-${DEB_VERSION}
