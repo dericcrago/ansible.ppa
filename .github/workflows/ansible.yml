@@ -39,16 +39,16 @@ jobs:
         env:
           DEB_NAME: ansible
           DEB_VERSION: "2.10.7"
-          DEB_RELEASE: 1ppa
+          DEB_RELEASE: 2ppa
           DEB_DIST: groovy focal bionic
           DEB_PPA: ansible
           DEBSIGN_KEYID: ${{ secrets.DEBSIGN_KEYID }}
-          TARBALL_URL: https://files.pythonhosted.org/packages/ba/22/7b58a8ba8e43159dc5cb32d97dd50e2b70b016585dbb188e9f2b61dac1e2/ansible-2.10.7.tar.gz
+          TARBALL_BASE_URL: https://pypi.python.org/packages/source
         run: |
           sudo apt -y install python3-setuptools devscripts debhelper dh-python python3-all
 
           cd ${HOME}
-          wget ${TARBALL_URL}
+          wget ${TARBALL_BASE_URL}/${DEB_NAME:0:1}/${DEB_NAME}/${DEB_NAME}-${DEB_VERSION}.tar.gz
           rm -rf ${DEB_NAME}-${DEB_VERSION}
           tar -xzf ${DEB_NAME}-${DEB_VERSION}.tar.gz
           cd ${HOME}/${DEB_NAME}-${DEB_VERSION}
