@@ -3,7 +3,7 @@ name: ansible-base
 on:
   push:
     branches:
-      - main
+      - stable
     paths:
       - .github/workflows/ansible-base.yml
 jobs:
@@ -18,13 +18,13 @@ jobs:
           SIGNING_PASSPHRASE: ${{ secrets.SIGNING_PASSPHRASE }}
           SIGNING_OWNERTRUST: ${{ secrets.SIGNING_OWNERTRUST }}
         run: |
-          sudo apt -y install wget gpg gpg-agent
-
           sudo apt -y remove ansible || true
           sudo apt -y remove ansible-base || true
           sudo apt -y remove ansible-core || true
           sudo apt -y remove ansible-test || true
           sudo apt -y autoremove
+
+          sudo apt -y install wget gpg gpg-agent
 
           echo "${DPUT_CF}" > ${HOME}/.dput.cf
           echo "${SIGNING_KEY}" > ${HOME}/signing.key
@@ -38,10 +38,10 @@ jobs:
       - name: build
         env:
           DEB_NAME: ansible-base
-          DEB_VERSION: "2.10.5"
-          DEB_RELEASE: 7ppa
+          DEB_VERSION: "2.10.6"
+          DEB_RELEASE: 1ppa
           DEB_DIST: groovy focal bionic
-          DEB_PPA: ansible-base
+          DEB_PPA: ansible
           DEBSIGN_KEYID: ${{ secrets.DEBSIGN_KEYID }}
           OFFICIAL: yes
           TARBALL_BASE_URL: https://pypi.python.org/packages/source
