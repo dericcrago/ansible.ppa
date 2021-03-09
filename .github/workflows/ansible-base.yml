@@ -3,7 +3,7 @@ name: ansible-base
 on:
   push:
     branches:
-      - stable
+      - stable-3
     paths:
       - .github/workflows/ansible-base.yml
 jobs:
@@ -41,7 +41,7 @@ jobs:
           DEB_VERSION: "2.10.6"
           DEB_RELEASE: 1ppa
           DEB_DIST: groovy focal bionic
-          DEB_PPA: ansible
+          DEB_PPA: ansible-3
           DEBSIGN_KEYID: ${{ secrets.DEBSIGN_KEYID }}
           OFFICIAL: yes
           TARBALL_BASE_URL: https://pypi.python.org/packages/source
