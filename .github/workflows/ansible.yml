@@ -18,13 +18,13 @@ jobs:
           SIGNING_PASSPHRASE: ${{ secrets.SIGNING_PASSPHRASE }}
           SIGNING_OWNERTRUST: ${{ secrets.SIGNING_OWNERTRUST }}
         run: |
-          sudo apt -y install wget gpg gpg-agent
-
           sudo apt -y remove ansible || true
           sudo apt -y remove ansible-base || true
           sudo apt -y remove ansible-core || true
           sudo apt -y remove ansible-test || true
           sudo apt -y autoremove
+
+          sudo apt -y install wget gpg gpg-agent
 
           echo "${DPUT_CF}" > ${HOME}/.dput.cf
           echo "${SIGNING_KEY}" > ${HOME}/signing.key
@@ -39,8 +39,8 @@ jobs:
         env:
           DEB_NAME: ansible
           DEB_VERSION: "2.9.18"
-          DEB_RELEASE: 1ppa
-          DEB_DIST: groovy focal bionic
+          DEB_RELEASE: 2ppa
+          DEB_DIST: groovy focal bionic xenial trusty
           DEB_PPA: ansible-2.9
           DEBSIGN_KEYID: ${{ secrets.DEBSIGN_KEYID }}
           OFFICIAL: yes
