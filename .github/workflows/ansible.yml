@@ -39,8 +39,8 @@ jobs:
         env:
           DEB_NAME: ansible
           DEB_VERSION: "2.8.19"
-          DEB_RELEASE: 1ppa
-          DEB_DIST: groovy focal bionic
+          DEB_RELEASE: 2ppa
+          DEB_DIST: groovy focal bionic xenial trusty
           DEB_PPA: ansible-2.8
           DEBSIGN_KEYID: ${{ secrets.DEBSIGN_KEYID }}
           OFFICIAL: yes
