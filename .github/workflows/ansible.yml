@@ -3,11 +3,11 @@ name: ansible
 on:
   push:
     branches:
-      - main
+      - stable-2.9
     paths:
       - .github/workflows/ansible.yml
 jobs:
-  build_ansible:
+  build_ansible_base:
     name: Build ansible
     runs-on: ubuntu-20.04
     steps:
@@ -38,37 +38,21 @@ jobs:
       - name: build
         env:
           DEB_NAME: ansible
-          DEB_VERSION: "2.10.7"
-          DEB_RELEASE: 2ppa
+          DEB_VERSION: "2.9.18"
+          DEB_RELEASE: 1ppa
           DEB_DIST: groovy focal bionic
-          DEB_PPA: ansible
+          DEB_PPA: ansible-2.9
           DEBSIGN_KEYID: ${{ secrets.DEBSIGN_KEYID }}
+          OFFICIAL: yes
           TARBALL_BASE_URL: https://pypi.python.org/packages/source
+          DEBUILD_ADD_OPTS: '-p"gpg --pinentry-mode loopback --passphrase-file ${HOME}/signing.passphrase"'
         run: |
-          sudo apt -y install python3-setuptools devscripts debhelper dh-python python3-all
+          sudo apt -y install make python python-packaging python3-straight.plugin python3-docutils python-setuptools devscripts cdbs debhelper python-docutils dh-python
 
           cd ${HOME}
           wget ${TARBALL_BASE_URL}/${DEB_NAME:0:1}/${DEB_NAME}/${DEB_NAME}-${DEB_VERSION}.tar.gz
           rm -rf ${DEB_NAME}-${DEB_VERSION}
           tar -xzf ${DEB_NAME}-${DEB_VERSION}.tar.gz
           cd ${HOME}/${DEB_NAME}-${DEB_VERSION}
-          _ANSIBLE_SDIST_FROM_MAKEFILE=1 python3 setup.py sdist --dist-dir=dist
-          for DIST in ${DEB_DIST}; do
-            mkdir -p deb-build/${DIST}
-            tar -C deb-build/${DIST} -xzf dist/${DEB_NAME}-${DEB_VERSION}.tar.gz
-            cat > deb-build/${DIST}/${DEB_NAME}-${DEB_VERSION}/debian/changelog << EOF
-          ${DEB_NAME} (${DEB_VERSION}-${DEB_RELEASE}~${DIST}) ${DIST}; urgency=low
-
-            * ${DEB_VERSION} release
-
-           -- Ansible, Inc. <info@ansible.com>  $(date -R)
-          EOF
-            cat deb-build/${DIST}/${DEB_NAME}-${DEB_VERSION}/debian/changelog
-            sed -i 's/debhelper-compat (= 12)/debhelper-compat (= 11)/g' deb-build/${DIST}/${DEB_NAME}-${DEB_VERSION}/debian/control
-            cat deb-build/${DIST}/${DEB_NAME}-${DEB_VERSION}/debian/control
-            chmod +x deb-build/${DIST}/${DEB_NAME}-${DEB_VERSION}/debian/rules
-            cd deb-build/${DIST}/${DEB_NAME}-${DEB_VERSION}
-            debuild --source-option='-I' -k${DEBSIGN_KEYID} -S -p"gpg --pinentry-mode loopback --passphrase-file ${HOME}/signing.passphrase"
-            cd -
-            dput ${DEB_PPA} deb-build/${DIST}/${DEB_NAME}_${DEB_VERSION}-${DEB_RELEASE}~${DIST}_source.changes
-          done
+          sed -i 's/^DEBUILD = $(DEBUILD_BIN) $(DEBUILD_OPTS)$/DEBUILD_ADD_OPTS ?=\nDEBUILD = $(DEBUILD_BIN) $(DEBUILD_OPTS) $(DEBUILD_ADD_OPTS)/g' Makefile
+          time make deb-src-upload
