@@ -41,13 +41,13 @@ jobs:
           DEB_VERSION: "2.11.0b1"
           DEB_RELEASE: 1ppa
           DEB_DIST: hirsute groovy focal bionic
-          DEB_PPA: beta
+          DEB_PPA: ansible-beta
           DEBSIGN_KEYID: ${{ secrets.DEBSIGN_KEYID }}
           OFFICIAL: yes
           TARBALL_BASE_URL: https://pypi.python.org/packages/source
           DEBUILD_ADD_OPTS: '-p"gpg --pinentry-mode loopback --passphrase-file ${HOME}/signing.passphrase"'
         run: |
-          sudo apt -y install make python python-packaging python-setuptools python3-straight.plugin python3-jinja2 python3-yaml python3-docutils devscripts cdbs debhelper dh-python python3-setuptools python3-packaging
+          sudo apt -y install make python python-packaging python-setuptools python3-straight.plugin python3-jinja2 python3-yaml python3-docutils python3-resolvelib devscripts cdbs debhelper dh-python python3-setuptools python3-packaging
 
           cd ${HOME}
           wget ${TARBALL_BASE_URL}/${DEB_NAME:0:1}/${DEB_NAME}/${DEB_NAME}-${DEB_VERSION}.tar.gz
