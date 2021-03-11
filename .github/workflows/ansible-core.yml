@@ -1,14 +1,14 @@
 ---
-name: ansible-base
+name: ansible-core
 on:
   push:
     branches:
-      - stable
+      - beta
     paths:
-      - .github/workflows/ansible-base.yml
+      - .github/workflows/ansible-core.yml
 jobs:
-  build_ansible_base:
-    name: Build ansible-base
+  build_ansible_core:
+    name: Build ansible-core
     runs-on: ubuntu-20.04
     steps:
       - name: setup
@@ -37,11 +37,11 @@ jobs:
 
       - name: build
         env:
-          DEB_NAME: ansible-base
-          DEB_VERSION: "2.10.6"
+          DEB_NAME: ansible-core
+          DEB_VERSION: "2.11.0b1"
           DEB_RELEASE: 1ppa
-          DEB_DIST: groovy focal bionic
-          DEB_PPA: ansible
+          DEB_DIST: hirsute groovy focal bionic
+          DEB_PPA: beta
           DEBSIGN_KEYID: ${{ secrets.DEBSIGN_KEYID }}
           OFFICIAL: yes
           TARBALL_BASE_URL: https://pypi.python.org/packages/source
